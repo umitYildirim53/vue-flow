@@ -1,21 +1,38 @@
 <script setup>
-import { Panel, PanelPosition, VueFlow, isNode, useVueFlow } from '@vue-flow/core'
-import { Background } from '@vue-flow/background'
-import { Controls } from '@vue-flow/controls'
-import { MiniMap } from '@vue-flow/minimap'
-import { ref } from 'vue'
-import { initialElements } from './initial-elements.js'
+import {
+  Panel,
+  PanelPosition,
+  VueFlow,
+  isNode,
+  useVueFlow,
+} from "@vue-flow/core";
+import { Background } from "@vue-flow/background";
+import { Controls } from "@vue-flow/controls";
+import { MiniMap } from "@vue-flow/minimap";
+import { ref, computed } from "vue";
+import { initialElements } from "./initial-elements.js";
+import useStore from "./store.js";
 
 /**
  * useVueFlow provides all event handlers and store properties
  * You can pass the composable an object that has the same properties as the VueFlow component props
  */
-const { onPaneReady, onNodeDragStop, onConnect, addEdges, setTransform, toObject } = useVueFlow()
+const {
+  onPaneReady,
+  onNodeDragStop,
+  onConnect,
+  addEdges,
+  setTransform,
+  toObject,
+} = useVueFlow();
 
 /**
  * Our elements
  */
-const elements = ref(initialElements)
+
+const store = useStore();
+
+onConnect((params) => addEdges([params]));
 
 /**
  * This is a Vue Flow event-hook which can be listened to from anywhere you call the composable, instead of only on the main component
@@ -23,18 +40,18 @@ const elements = ref(initialElements)
  * onPaneReady is called when viewpane & nodes have visible dimensions
  */
 onPaneReady(({ fitView }) => {
-  fitView()
-})
+  fitView();
+});
 
-onNodeDragStop((e) => console.log('drag stop', e))
+onNodeDragStop((e) => console.log("drag stop", e));
 
 /**
  * onConnect is called when a new connection is created.
  * You can add additional properties to your new edge (like a type or label) or block the creation altogether
  */
-onConnect((params) => addEdges([params]))
+onConnect((params) => addEdges([params]));
 
-const dark = ref(false)
+const dark = ref(false);
 
 /**
  * To update node properties you can simply use your elements v-model and mutate the elements directly
@@ -46,37 +63,56 @@ const updatePos = () =>
       el.position = {
         x: Math.random() * 400,
         y: Math.random() * 400,
-      }
+      };
     }
-  })
+  });
 
 /**
  * toObject transforms your current graph data to an easily persist-able object
  */
-const logToObject = () => console.log(toObject())
+const logToObject = () => console.log(toObject());
 
 /**
  * Resets the current viewpane transformation (zoom & pan)
  */
-const resetTransform = () => setTransform({ x: 0, y: 0, zoom: 1 })
+const resetTransform = () => setTransform({ x: 0, y: 0, zoom: 1 });
 
-const toggleClass = () => (dark.value = !dark.value)
+const toggleClass = () => (dark.value = !dark.value);
 </script>
 
 <template>
-  <VueFlow v-model="elements" :class="{ dark }" class="basicflow" :default-viewport="{ zoom: 1.5 }" :min-zoom="0.2" :max-zoom="4">
+  <VueFlow
+    v-model="store.elements"
+    :class="{ dark }"
+    class="basicflow"
+    :default-viewport="{ zoom: 1.5 }"
+    :min-zoom="0.2"
+    :max-zoom="4"
+    :fit-view-on-init="true"
+  >
     <Background :pattern-color="dark ? '#FFFFFB' : '#aaa'" gap="8" />
     <MiniMap />
     <Controls />
 
-    <Panel :position="PanelPosition.TopRight" class="controls">
-      <button style="background-color: #113285; color: white" title="Reset Transform" @click="resetTransform">
+    <Panel :position="PanelPosition.TopLeft" class="controls">
+      <button
+        style="background-color: #113285; color: white"
+        title="Reset Transform"
+        @click="resetTransform"
+      >
         <svg width="16" height="16" viewBox="0 0 32 32">
-          <path fill="#FFFFFB" d="M18 28A12 12 0 1 0 6 16v6.2l-3.6-3.6L1 20l6 6l6-6l-1.4-1.4L8 22.2V16a10 10 0 1 1 10 10Z" />
+          <path
+            fill="#FFFFFB"
+            d="M18 28A12 12 0 1 0 6 16v6.2l-3.6-3.6L1 20l6 6l6-6l-1.4-1.4L8 22.2V16a10 10 0 1 1 10 10Z"
+          />
         </svg>
       </button>
 
-      <button style="background-color: #6f3381" title="Shuffle Node Positions" @click="updatePos">
+      <button
+        style="background-color: #6f3381"
+        title="Shuffle Node Positions"
+        @click="updatePos"
+      >
         <svg width="16" height="16" viewBox="0 0 24 24">
           <path
             fill="#FFFFFB"
@@ -86,7 +122,10 @@ const toggleClass = () => (dark.value = !dark.value)
       </button>
 
       <button
-        :style="{ backgroundColor: dark ? '#FFFFFB' : '#292524', color: dark ? '#292524' : '#FFFFFB' }"
+        :style="{
+          backgroundColor: dark ? '#FFFFFB' : '#292524',
+          color: dark ? '#292524' : '#FFFFFB',
+        }"
         @click="toggleClass"
       >
         <template v-if="dark">
@@ -117,8 +156,15 @@ const toggleClass = () => (dark.value = !dark.value)
         </svg>
       </button>
     </Panel>
+    <Panel :position="PanelPosition.TopRight" class="save-restore-controls">
+      <button style="background-color: #33a6b8" @click="onSave">save</button>
+      <button style="background-color: #113285" @click="onRestore">
+        restore
+      </button>
+      <button style="background-color: #6f3381" @click="onAdd">add node</button>
+    </Panel>
   </VueFlow>
 </template>
 <style>
-@import "./main.css"
+@import "./main.css";
 </style>

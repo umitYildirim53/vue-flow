@@ -12,6 +12,7 @@
     "@vue-flow/background": "^1.0.5",
     "@vue-flow/controls": "^1.0.4",
     "@vue-flow/minimap": "^1.0.4",
+    "pinia": "^2.0.33",
     "vue": "^3.2.45"
   },
   "devDependencies": {
