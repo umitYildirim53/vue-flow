@@ -34,9 +34,13 @@ const useStore = defineStore("elementsStore", {
         { id: "e1-3", source: "1", target: "3" },
         { id: "e3-4", source: "3", target: "4" },
       ],
+      dark: false,
     };
   },
   actions: {
+    changeTheme() {
+      this.dark = this.dark === false ? true : false;
+    },
     log() {
       console.log("stored elements", this.elements);
     },

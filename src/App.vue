@@ -24,6 +24,8 @@ const getId = () => `dndnode_${id++}`;
 
 const store = useStore();
 
+const dark = ref(store.dark);
+
 const {
   onPaneReady,
   onNodeDragStop,
@@ -109,33 +111,10 @@ onNodeDragStop((e) => console.log("drag stop", e));
  */
 onConnect((params) => addEdges([params]));
 
-const dark = ref(false);
-
 /**
  * To update node properties you can simply use your elements v-model and mutate the elements directly
  * Changes should always be reflected on the graph reactively, without the need to overwrite the elements
  */
-const updatePos = () =>
-  store.elements.forEach((el) => {
-    if (isNode(el)) {
-      el.position = {
-        x: Math.random() * 400,
-        y: Math.random() * 400,
-      };
-    }
-  });
-
-/**
- * toObject transforms your current graph data to an easily persist-able object
- */
-const logToObject = () => console.log(toObject());
-
-/**
- * Resets the current viewpane transformation (zoom & pan)
- */
-const resetTransform = () => setTransform({ x: 0, y: 0, zoom: 1 });
-
-const toggleClass = () => (dark.value = !dark.value);
 </script>
 
 <template>
@@ -154,7 +133,7 @@ const toggleClass = () => (dark.value = !dark.value);
       <MiniMap />
       <Controls />
 
-      <Panel :position="PanelPosition.TopLeft" class="controls">
+      <!-- <Panel :position="PanelPosition.TopLeft" class="controls">
         <button
           style="background-color: #113285; color: white"
           title="Reset Transform"
@@ -215,7 +194,7 @@ const toggleClass = () => (dark.value = !dark.value);
             />
           </svg>
         </button>
-      </Panel>
+      </Panel> -->
       <SaveRestoreControls />
     </VueFlow>
     <Sidebar />
