@@ -6,7 +6,12 @@ import useStore from "../store.js";
 const store = useStore();
 
 const flowKey = "example-flow";
-const dark = ref(store.dark);
+const dark = ref(false);
+const items = ref([
+  { title: "Domain1" },
+  { title: "Domain2" },
+  { title: "Domain3" },
+]);
 const {
   nodes,
   addNodes,
@@ -21,6 +26,8 @@ const onSave = () => {
   localStorage.setItem(flowKey, JSON.stringify(toObject()));
 };
 
+const emit = defineEmits(["theme"]);
+
 const onRestore = () => {
   const flow = JSON.parse(localStorage.getItem(flowKey));
 
@@ -32,15 +39,15 @@ const onRestore = () => {
   }
 };
 
-const updatePos = () =>
-  store.elements.forEach((el) => {
-    if (isNode(el)) {
-      el.position = {
-        x: Math.random() * 400,
-        y: Math.random() * 400,
-      };
-    }
-  });
+// const updatePos = () =>
+//   store.elements.forEach((el) => {
+//     if (isNode(el)) {
+//       el.position = {
+//         x: Math.random() * 400,
+//         y: Math.random() * 400,
+//       };
+//     }
+//   });
 
 const onAdd = () => {
   const id = nodes.value.length + 1;
@@ -59,14 +66,17 @@ const onAdd = () => {
 /**
  * toObject transforms your current graph data to an easily persist-able object
  */
-const logToObject = () => console.log(toObject());
+// const logToObject = () => console.log(toObject());
 
 /**
  * Resets the current viewpane transformation (zoom & pan)
  */
 const resetTransform = () => setTransform({ x: 0, y: 0, zoom: 1 });
 
-const toggleClass = () => (dark.value = !dark.value);
+const toggleClass = () => {
+  dark.value = !dark.value;
+  emit("theme", dark.value);
+};
 </script>
 
 <template>
@@ -91,7 +101,7 @@ const toggleClass = () => (dark.value = !dark.value);
       </svg>
     </button>
 
-    <button
+    <!-- <button
       style="background-color: #6f3381"
       title="Shuffle Node Positions"
       @click="updatePos"
@@ -102,14 +112,14 @@ const toggleClass = () => (dark.value = !dark.value);
           d="M14 20v-2h2.6l-3.2-3.2l1.425-1.425L18 16.55V14h2v6Zm-8.6 0L4 18.6L16.6 6H14V4h6v6h-2V7.4Zm3.775-9.425L4 5.4L5.4 4l5.175 5.175Z"
         />
       </svg>
-    </button>
+    </button> -->
 
     <button
       :style="{
         backgroundColor: dark ? '#FFFFFB' : '#292524',
         color: dark ? '#292524' : '#FFFFFB',
       }"
-      @click="store.changeTheme()"
+      @click="toggleClass()"
     >
       <template v-if="dark">
         <svg width="16" height="16" viewBox="0 0 24 24">
@@ -129,14 +139,31 @@ const toggleClass = () => (dark.value = !dark.value);
         </svg>
       </template>
     </button>
+    <v-btn color="primary">
+      Domain
 
-    <button title="Log `toObject`" @click="logToObject">
+      <v-menu activator="parent">
+        <v-list>
+          <v-list-item
+            v-for="(item, index) in items"
+            :key="index"
+            :value="index"
+            :to="Home"
+          >
+            <v-list-item-title>
+              {{ item.title }}
+            </v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    </v-btn>
+    <!-- <button title="Log `toObject`" @click="logToObject">
       <svg width="16" height="16" viewBox="0 0 24 24">
         <path
           fill="#292524"
           d="M20 19V7H4v12h16m0-16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16m-7 14v-2h5v2h-5m-3.42-4L5.57 9H8.4l3.3 3.3c.39.39.39 1.03 0 1.42L8.42 17H5.59l3.99-4Z"
         />
       </svg>
-    </button>
+    </button> -->
   </Panel>
 </template>

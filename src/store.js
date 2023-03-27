@@ -38,9 +38,6 @@ const useStore = defineStore("elementsStore", {
     };
   },
   actions: {
-    changeTheme() {
-      this.dark = this.dark === false ? true : false;
-    },
     log() {
       console.log("stored elements", this.elements);
     },
